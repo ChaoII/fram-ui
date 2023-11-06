@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import {onMounted, onUnmounted, reactive, ref} from 'vue'
 import type {Ref} from 'vue'
-import type {FormInstance} from 'element-plus'
+import type {FormInstance, UploadRawFile} from 'element-plus'
 import type {GetFaceInfosInterface, SettingFormInterface} from "@/api/interface";
-import {faceDeleteApi, getFaceInfosApi, getSettingsApi, restartDeviceApi, updateSettingApi} from "@/api/settings";
+import {
+  addFaceApi,
+  faceDeleteApi,
+  getFaceInfosApi,
+  getSettingsApi,
+  restartDeviceApi,
+  updateSettingApi
+} from "@/api/settings";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {useMediaAddress} from "@/stores/userInfo";
 import type {FaceInfoInterface, QueryParamInterface} from "@/page/settings/interface";
@@ -11,12 +18,10 @@ import {Search} from "@element-plus/icons-vue";
 import {host} from "@/utils/service";
 
 
-// const faceInfo = ref<FaceInfoInterface>({
-//   name: "",
-//   uid: "",
-//   pic_url: "",
-//   register_time: ""
-// });
+const faceInfo = reactive({"name": "", "uid": "", "faceFile": "", "pic_url": ""})
+
+
+const dialogFormVisible = ref(false)
 const totalPage = ref(0)
 const queryParams = ref<GetFaceInfosInterface>({
   query_name: "",
@@ -27,7 +32,6 @@ const queryParams = ref<GetFaceInfosInterface>({
 const faceInfos: Ref<FaceInfoInterface[]> = ref([])
 
 const deleteFace = async (uid: string) => {
-
   try {
     await ElMessageBox.confirm(
         '确定删除该用户吗？',
@@ -62,6 +66,41 @@ const getFaceInfos = async () => {
   }
 }
 
+const openAddDialog = async () => {
+  dialogFormVisible.value = true;
+}
+const cancelAddFace = async () => {
+  dialogFormVisible.value = false
+  await clearAddFaceInfo()
+}
+
+
+const beforeUpload = (rawFile) => {
+  console.log(rawFile)
+  faceInfo.faceFile = rawFile.raw
+  faceInfo.pic_url = URL.createObjectURL(rawFile.raw)
+}
+
+const submitAdd = async () => {
+  let formData = new FormData()
+  console.log(faceInfo.faceFile)
+  formData.append('file', faceInfo.faceFile)
+  formData.append("name", faceInfo.name)
+  formData.append("uid", faceInfo.uid)
+  const res = await addFaceApi(formData, {"Content-Type": "multipart/form-data"})
+  if (res.data) {
+    dialogFormVisible.value = false;
+    await getFaceInfos();
+  }
+}
+
+const clearAddFaceInfo = async () => {
+  faceInfo.faceFile = ""
+  faceInfo.uid = ""
+  faceInfo.name = ""
+  faceInfo.pic_url = ""
+}
+
 </script>
 <template>
   <el-card class="content-card">
@@ -74,6 +113,9 @@ const getFaceInfos = async () => {
             </div>
             <div style="margin-left: 10px">
               <el-button type="primary" :icon="'Search'" @click="getFaceInfos">搜索</el-button>
+            </div>
+            <div style="margin-left: 10px">
+              <el-button type="primary" :icon="'Plus'" @click="openAddDialog">新增</el-button>
             </div>
           </div>
         </div>
@@ -122,6 +164,50 @@ const getFaceInfos = async () => {
       </el-card>
     </div>
   </el-card>
+
+
+  <el-dialog v-model="dialogFormVisible" destroy-on-close @close="clearAddFaceInfo" title="新增人脸" width="550px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div style="border: 1px dashed  #ccc;">
+        <el-upload
+            class="avatar-uploader"
+            action="#"
+            :show-file-list="false"
+            @change="beforeUpload"
+            :auto-upload="false"
+        >
+          <el-image v-if="faceInfo.pic_url" :src="faceInfo.pic_url" class="avatar"/>
+          <el-icon v-else class="avatar-uploader-icon">
+            <Plus/>
+          </el-icon>
+        </el-upload>
+      </div>
+
+      <div class="faceInfo">
+        <el-form
+            :label-position="'top'"
+            label-width="100px"
+            :model="faceInfo"
+            style="width: 300px;"
+        >
+          <el-form-item label="姓名：">
+            <el-input v-model="faceInfo.name" placeholder="请输入用户名"/>
+          </el-form-item>
+          <el-form-item label="工号：">
+            <el-input v-model="faceInfo.uid" placeholder="请输入工号"/>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+    <template #footer>
+      <div class="">
+        <el-button @click="cancelAddFace">取消
+        </el-button>
+        <el-button type="primary" @click="submitAdd">确定</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
 <style scoped>
 
@@ -129,6 +215,33 @@ const getFaceInfos = async () => {
   position: relative;
   width: 60%;
   height: calc(100vh - 52px);
+}
+
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
 }
 
 .el-form-item {
