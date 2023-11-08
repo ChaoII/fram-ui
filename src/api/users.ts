@@ -47,7 +47,7 @@ export const userDeleteApi = (data: DeleteUserInterface) => {
 
 export const modifyPasswordApi = (data: ModifyPasswordInterface) => {
     return post({
-        url: "user/modify_password",
+        url: "user/modifyPassword",
         data
     })
 }

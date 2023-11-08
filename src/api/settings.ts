@@ -23,14 +23,14 @@ export const restartDeviceApi = () => {
 
 export const getFaceInfosApi = (data: GetFaceInfosInterface) => {
     return post({
-        url: "/get_face_infos",
+        url: "/staff/getFaceInfos",
         data: data
     })
 }
 
 export const addFaceApi = async (data: any, headers: any) => {
     return put({
-        url: "/add_face",
+        url: "/staff/addFace",
         headers: headers,
         data: data
     })
@@ -38,7 +38,7 @@ export const addFaceApi = async (data: any, headers: any) => {
 
 export const faceDeleteApi = (data: any) => {
     return del({
-        url: "/delete_face",
+        url: "/staff/deleteFace",
         data: data
     })
 }

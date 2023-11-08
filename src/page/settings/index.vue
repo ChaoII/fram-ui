@@ -31,23 +31,23 @@ const queryParams = ref<GetFaceInfosInterface>({
 
 const faceInfos: Ref<FaceInfoInterface[]> = ref([])
 
-const deleteFace = async (uid: string) => {
+const deleteFace = async (index_id: string) => {
   try {
     await ElMessageBox.confirm(
         '确定删除该用户吗？',
-        'Warning',
+        '警告',
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
         }
     )
-    const data = {"uid": uid}
+    const data = {"index_id": index_id}
     // eslint-disable-next-line no-unused-vars
     const res = await faceDeleteApi(data)
-    if (res) {
+    if (res.code == 0) {
       await getFaceInfos()
-      ElMessage.success("用户删除成功")
+      ElMessage.success("删除人脸成功")
     }
   } catch (e) {
     ElMessage.success("取消删除")
@@ -60,7 +60,7 @@ onMounted(async () => {
 
 const getFaceInfos = async () => {
   const res = await getFaceInfosApi(queryParams.value)
-  if (res.data.face_infos) {
+  if (res.code == 0) {
     faceInfos.value = res.data.face_infos
     totalPage.value = res.data.total
   }
@@ -71,7 +71,6 @@ const openAddDialog = async () => {
 }
 const cancelAddFace = async () => {
   dialogFormVisible.value = false
-  await clearAddFaceInfo()
 }
 
 
@@ -91,6 +90,9 @@ const submitAdd = async () => {
   if (res.data) {
     dialogFormVisible.value = false;
     await getFaceInfos();
+  } else {
+    dialogFormVisible.value = false;
+    ElMessage.error("添加人脸失败")
   }
 }
 
@@ -143,7 +145,7 @@ const clearAddFaceInfo = async () => {
                   <el-input v-model="faceInfo.register_time"/>
                 </el-form-item>
               </el-form>
-              <el-button :size="'small'" type="danger" :icon="'Delete'" @click="deleteFace(faceInfo.uid)">删除
+              <el-button :size="'small'" type="danger" :icon="'Delete'" @click="deleteFace(faceInfo.index_id)">删除
               </el-button>
             </el-card>
           </div>
