@@ -1,6 +1,6 @@
 export interface FaceInfoInterface {
     id: string,
-    "index_id": string,
+    index_id: string,
     name: string,
     uid: string,
     pic_url: string,

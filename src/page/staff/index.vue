@@ -1,35 +1,28 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, reactive, ref} from 'vue'
-import type {Ref} from 'vue'
-import type {FormInstance, UploadRawFile} from 'element-plus'
-import type {GetFaceInfosInterface, SettingFormInterface} from "@/api/interface";
-import {
-  addFaceApi,
-  faceDeleteApi,
-  getFaceInfosApi,
-  getSettingsApi,
-  restartDeviceApi,
-  updateSettingApi
-} from "@/api/settings";
+import {onMounted, reactive, ref} from 'vue'
+import type {GetFaceInfosInterface} from "@/api/interface";
+import {addFaceApi, faceDeleteApi, getFaceInfosApi} from "@/api/staff";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {useMediaAddress} from "@/stores/userInfo";
-import type {FaceInfoInterface, QueryParamInterface} from "@/page/settings/interface";
-import {Search} from "@element-plus/icons-vue";
+import type {FaceInfoInterface} from "@/page/staff/interface";
 import {host} from "@/utils/service";
-
-
-const faceInfo = reactive({"name": "", "uid": "", "faceFile": "", "pic_url": ""})
 
 
 const dialogFormVisible = ref(false)
 const totalPage = ref(0)
+const faceInfos = ref<FaceInfoInterface[]>()
 const queryParams = ref<GetFaceInfosInterface>({
   query_name: "",
   pageSize: 5,
   pageIndex: 1
 })
 
-const faceInfos: Ref<FaceInfoInterface[]> = ref([])
+const addFaceInfo = reactive({
+  faceFile: "",
+  name: "",
+  uid: "",
+  pic_url: ""
+})
+
 
 const deleteFace = async (index_id: string) => {
   try {
@@ -44,7 +37,7 @@ const deleteFace = async (index_id: string) => {
     )
     const data = {"index_id": index_id}
     // eslint-disable-next-line no-unused-vars
-    const res = await faceDeleteApi(data)
+    const res: any = await faceDeleteApi(data)
     if (res.code == 0) {
       await getFaceInfos()
       ElMessage.success("删除人脸成功")
@@ -59,7 +52,8 @@ onMounted(async () => {
 })
 
 const getFaceInfos = async () => {
-  const res = await getFaceInfosApi(queryParams.value)
+  const res: any = await getFaceInfosApi(queryParams.value)
+  console.log(res)
   if (res.code == 0) {
     faceInfos.value = res.data.face_infos
     totalPage.value = res.data.total
@@ -74,18 +68,17 @@ const cancelAddFace = async () => {
 }
 
 
-const beforeUpload = (rawFile) => {
-  console.log(rawFile)
-  faceInfo.faceFile = rawFile.raw
-  faceInfo.pic_url = URL.createObjectURL(rawFile.raw)
+const beforeUpload = (rawFile: any) => {
+  addFaceInfo.faceFile = rawFile.raw
+  addFaceInfo.pic_url = URL.createObjectURL(rawFile.raw)
 }
 
 const submitAdd = async () => {
   let formData = new FormData()
-  console.log(faceInfo.faceFile)
-  formData.append('file', faceInfo.faceFile)
-  formData.append("name", faceInfo.name)
-  formData.append("uid", faceInfo.uid)
+  console.log(addFaceInfo.faceFile)
+  formData.append('file', addFaceInfo.faceFile)
+  formData.append("name", addFaceInfo.name)
+  formData.append("uid", addFaceInfo.uid)
   const res = await addFaceApi(formData, {"Content-Type": "multipart/form-data"})
   if (res.data) {
     dialogFormVisible.value = false;
@@ -97,10 +90,9 @@ const submitAdd = async () => {
 }
 
 const clearAddFaceInfo = async () => {
-  faceInfo.faceFile = ""
-  faceInfo.uid = ""
-  faceInfo.name = ""
-  faceInfo.pic_url = ""
+  addFaceInfo.uid = ""
+  addFaceInfo.name = ""
+  addFaceInfo.pic_url = ""
 }
 
 </script>
@@ -178,7 +170,7 @@ const clearAddFaceInfo = async () => {
             @change="beforeUpload"
             :auto-upload="false"
         >
-          <el-image v-if="faceInfo.pic_url" :src="faceInfo.pic_url" class="avatar"/>
+          <el-image v-if="addFaceInfo.pic_url" :src="addFaceInfo.pic_url" class="avatar"/>
           <el-icon v-else class="avatar-uploader-icon">
             <Plus/>
           </el-icon>
@@ -189,14 +181,14 @@ const clearAddFaceInfo = async () => {
         <el-form
             :label-position="'top'"
             label-width="100px"
-            :model="faceInfo"
+            :model="addFaceInfo"
             style="width: 300px;"
         >
           <el-form-item label="姓名：">
-            <el-input v-model="faceInfo.name" placeholder="请输入用户名"/>
+            <el-input v-model="addFaceInfo.name" placeholder="请输入用户名"/>
           </el-form-item>
           <el-form-item label="工号：">
-            <el-input v-model="faceInfo.uid" placeholder="请输入工号"/>
+            <el-input v-model="addFaceInfo.uid" placeholder="请输入工号"/>
           </el-form-item>
         </el-form>
       </div>

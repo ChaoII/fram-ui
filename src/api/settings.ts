@@ -1,5 +1,6 @@
-import {get, post, del, put} from "@/utils/service";
-import type {GetFaceInfosInterface, SettingFormInterface} from "@/api/interface";
+
+import {get, post} from "@/utils/service";
+import type {SettingFormInterface} from "@/api/interface";
 
 export const updateSettingApi = (data: SettingFormInterface) => {
     return post({
@@ -18,27 +19,5 @@ export const getSettingsApi = () => {
 export const restartDeviceApi = () => {
     return get({
         url: "/restart_device",
-    })
-}
-
-export const getFaceInfosApi = (data: GetFaceInfosInterface) => {
-    return post({
-        url: "/staff/getFaceInfos",
-        data: data
-    })
-}
-
-export const addFaceApi = async (data: any, headers: any) => {
-    return put({
-        url: "/staff/addFace",
-        headers: headers,
-        data: data
-    })
-}
-
-export const faceDeleteApi = (data: any) => {
-    return del({
-        url: "/staff/deleteFace",
-        data: data
     })
 }

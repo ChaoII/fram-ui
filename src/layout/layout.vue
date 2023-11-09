@@ -6,7 +6,7 @@ import {ElMessage} from "element-plus";
 import type {FormInstance, FormRules} from "element-plus";
 import {modifyPasswordApi} from "@/api/users";
 import type {ModifyPasswordInterface} from "@/api/interface";
-import {Platform, Histogram, User, Tools} from '@element-plus/icons-vue'
+import {Notebook, Picture, User, Tools} from '@element-plus/icons-vue'
 
 const store = useUserInfo()
 const dialogModifyVisible = ref(false)
@@ -69,12 +69,11 @@ const logout = async () => {
 }
 
 </script>
-
 <template>
   <div class="outer">
     <div class="layout_header_container">
       <div class="layout_header_left center">
-        <el-text type="primary" style="font-size: 26px; font-weight: bold">火车车厢智能识别系统</el-text>
+        <el-text type="primary" style="font-size: 26px; font-weight: bold">人脸识别打卡机后台管理系统</el-text>
       </div>
       <div class="layout_header_center center">
         <el-menu class="menu center"
@@ -86,10 +85,17 @@ const logout = async () => {
                  active-text-color="#ffd04b"
         >
           <el-menu-item index="/index">
+
             <el-icon>
-              <Platform/>
+              <Notebook/>
             </el-icon>
-            实时展示
+            打卡记录
+          </el-menu-item>
+          <el-menu-item index="/staff">
+            <el-icon>
+              <Picture/>
+            </el-icon>
+            人脸管理
           </el-menu-item>
           <el-menu-item index="/users">
             <el-icon>
@@ -101,7 +107,7 @@ const logout = async () => {
             <el-icon>
               <Tools/>
             </el-icon>
-            参数设置
+            系统设置
           </el-menu-item>
         </el-menu>
       </div>

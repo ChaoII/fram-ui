@@ -56,15 +56,14 @@ onMounted(async () => {
 
 window.addEventListener('resize', setTableHeight);
 
-const searchList = () => {
-  userListApi(queryParams).then(res => {
-    if (res.data) {
-      userList.value = res.data.user
-      total.value = res.data.total
-    }
-  })
+const searchList = async () => {
+  const res = await userListApi(queryParams)
+  if (res.data) {
+    userList.value = res.data.user
+    total.value = res.data.total
+  }
 }
-const addUser = () => {
+const addUser = async () => {
   dialogAddVisible.value = true
 }
 // 新增提交
@@ -84,7 +83,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     formAddData.password = ""
     formAddData.username = ""
     // 重新更新列表
-    searchList()
+    await searchList()
     ElMessage.success("新增用户成功!")
   }
 }
@@ -96,15 +95,14 @@ const submitEForm = async (formEl: FormInstance | undefined) => {
     return
   }
   // 提交修改
-  userEditApi(formEditData).then(res => {
-    if (res.data) {
-      dialogEditVisible.value = false;
-      searchList()
-    }
-  })
+  const ret = await userEditApi(formEditData)
+  if (ret.data) {
+    dialogEditVisible.value = false;
+    await searchList()
+  }
 }
 // 数据编辑
-const editRow = (row: any) => {
+const editRow = async (row: any) => {
   const {id, username, nickname} = row
   // 展示编辑表单
   dialogEditVisible.value = true;
@@ -115,30 +113,30 @@ const editRow = (row: any) => {
 
 
 // 删除数据
-const deleteRow = (row: any) => {
-  ElMessageBox.confirm(
-      '确定删除该用户吗？',
-      'Warning',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
-  ).then(() => {
+const deleteRow = async (row: any) => {
+  try {
+    await ElMessageBox.confirm(
+        '确定删除该用户吗？',
+        '警告',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+    )
     const data = {"id": row.id}
-    // eslint-disable-next-line no-unused-vars
-    userDeleteApi(data).then(res => {
-      searchList()
+    const res = await userDeleteApi(data)
+    if (res.code == 0) {
       ElMessage.success("用户删除成功")
-    })
-  }).catch(() => {
-        ElMessage.info("取消删除")
-      }
-  )
+    }
+    await searchList()
+  } catch (e) {
+    ElMessage.info("取消删除")
+  }
 }
 
-onMounted(() => {
-  searchList();
+onMounted(async () => {
+  await searchList();
 })
 
 </script>
@@ -180,7 +178,7 @@ onMounted(() => {
               <el-button type="primary" @click="editRow(scope.row)">编辑</el-button>
 
 
-                  <el-button type="danger" @click="deleteRow(scope.row)">删除</el-button>
+              <el-button type="danger" @click="deleteRow(scope.row)">删除</el-button>
 
 
             </template>

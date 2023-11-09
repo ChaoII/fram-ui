@@ -1,14 +1,10 @@
 <script setup lang="ts">
 
-import {Search} from '@element-plus/icons-vue'
 import type {Ref} from 'vue'
-import {onMounted, onUnmounted, reactive, ref} from 'vue'
-import {getAttendInfosApi} from "@/api/history";
-import type {TableDataInterface, PageInterface} from "@/page/home/interface";
+import {onMounted, reactive, ref} from 'vue'
+import {getAttendInfosApi} from "@/api/attend";
+import type {TableDataInterface, PageInterface} from "@/page/attend/interface";
 import {host} from "@/utils/service";
-import type {GetAttendsInterface, UpdateHistoryInterface} from "@/api/interface";
-import {ElMessage} from "element-plus";
-
 
 const currentDate = new Date()
 const currentDay = currentDate.getDate();
@@ -20,9 +16,7 @@ const dateTimeEnd = ref<Date>(new Date())
 const attend_name = ref("")
 const myElement = ref<HTMLElement | null>(null);
 const tableHeight = ref(0); // 默认最大高度为200px
-
 const is_show_image = ref(true)
-
 
 // 动态设置表格最大高度
 const setTableHeight = async () => {
@@ -61,18 +55,13 @@ const previewImage = (row: any) => {
   window.open(row.pic_url, "_blank")
 }
 
-
 const tableData: Ref<TableDataInterface[]> = ref([])
 onMounted(async () => {
-  await setTableHeight();
+  await getAttendInfos()
+  await setTableHeight()
 })
 
 window.addEventListener('resize', setTableHeight);
-
-
-onMounted(async () => {
-
-})
 
 
 </script>

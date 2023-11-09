@@ -18,7 +18,12 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: "/index",
                 name: "index",
-                component: () => import("@/page/home/index.vue")
+                component: () => import("@/page/attend/index.vue")
+            },
+            {
+                path: "/staff",
+                name: "staff",
+                component: () => import("@/page/staff/index.vue")
             },
             {
                 path: "/users",
@@ -28,8 +33,9 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: "/setting",
                 name: "setting",
-                component: () => import("@/page/settings/index.vue")
+                component: () => import("@/page/setting/index.vue")
             },
+
         ]
     }
 ]
