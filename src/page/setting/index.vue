@@ -1,67 +1,30 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, reactive, ref} from 'vue'
-import type {Ref} from 'vue'
+import {onMounted, reactive, ref} from 'vue'
 import type {FormInstance} from 'element-plus'
-import type {SettingFormInterface} from "@/api/interface";
 import {getSettingsApi, restartDeviceApi, updateSettingApi} from "@/api/settings";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {useMediaAddress} from "@/stores/userInfo";
+import {InfoFilled} from '@element-plus/icons-vue'
 
-
-const curDateTime = ref<Date>()
-const mediaStore = useMediaAddress()
 const ruleFormRef = ref<FormInstance>()
-const ruleForm = reactive<SettingFormInterface>({
-  distanceSteel: 0,
-  distanceCamera: 0,
-  deviceName: "-",
-  cameraAddress: "-",
-  mediaAddress: "-",
-  customParam: "-",
-  currentDateTime: new Date(),
-  deviceVersion: "-",
-  algorithmVersion: "-",
-  systemVersion: "-",
+const ruleForm = reactive({
+  autoDeleteInterval: 1,
+  unit: "month",
+  isEnable: true
 })
 
-const timer: Ref<number> = ref(0);
-const startTimer = async () => {
-  timer.value = window.setInterval(async () => {
-    ruleForm.currentDateTime = new Date()
-  }, 1000)
-}
-
-const stopTimer = async () => {
-  await clearInterval(timer.value)
-}
 
 onMounted(async () => {
-  ruleForm.currentDateTime = new Date()
-  await startTimer();
   await getSettings();
 })
-onUnmounted(async () => {
-  await stopTimer()
-})
+
 
 const getSettings = async () => {
   const result = await getSettingsApi()
   if (result.data) {
-    ruleForm.distanceSteel = result.data.distanceSteel
-    ruleForm.distanceCamera = result.data.distanceCamera
-    ruleForm.deviceName = result.data.deviceName
-    ruleForm.cameraAddress = result.data.cameraAddress
-    ruleForm.mediaAddress = result.data.mediaAddress
-    ruleForm.customParam = result.data.customParam
-    ruleForm.deviceVersion = result.data.deviceVersion
-    ruleForm.algorithmVersion = result.data.algorithmVersion
-    ruleForm.systemVersion = result.data.systemVersion
-    mediaStore.setMediaAddress({mediaAddress: result.data.mediaAddress})
+    ruleForm.autoDeleteInterval = result.data.autoDeleteInterval
+    ruleForm.unit = result.data.unit
+    ruleForm.isEnable = result.data.isEnable
   }
-}
-
-const jumpLink = async () => {
-  window.open(ruleForm.cameraAddress, "_blank")
 }
 
 const updateSettings = async () => {
@@ -82,19 +45,16 @@ const restartDevice = async () => {
 }
 
 const open = async () => {
-  await ElMessageBox.confirm('在重启前请确认保存数据，避免数据丢失，确认重启设备吗？', '警告', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: "warning",
-  }).then(() => {
-    restartDevice()
-  }).catch(() => {
-    console.log("取消")
-  })
-}
-
-const modifyDateTime = async () => {
-  await stopTimer()
+  try {
+    await ElMessageBox.confirm('在重启前请确认保存数据，避免数据丢失，确认重启设备吗？', '警告', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: "warning",
+    })
+    await restartDevice()
+  } catch {
+    ElMessage.warning("取消重启设备")
+  }
 }
 
 </script>
@@ -106,49 +66,53 @@ const modifyDateTime = async () => {
         label-width="150px"
         status-icon
     >
-      <el-form-item label="设备名称：" prop="deviceName">
-        <el-input v-model="ruleForm.deviceName"/>
-      </el-form-item>
-      <el-form-item label="磁钢-磁钢间距：" prop="distanceSteel">
-        <el-input v-model="ruleForm.distanceSteel">
-          <template #append>厘米</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="磁钢-摄像头间距：" prop="distanceCamera">
-        <el-input v-model="ruleForm.distanceCamera">
-          <template #append>厘米</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="摄像头访问地址：" prop="cameraAddress">
+      <el-form-item label="自动删除时间间隔：" prop="deviceName">
         <div style="width: 100%; display: flex">
-          <el-input style="padding-right: 20px" v-model="ruleForm.cameraAddress"/>
-          <el-button type="primary" @click="jumpLink">跳转</el-button>
+
+          <el-tooltip
+              class="box-item"
+              effect="light"
+              placement="right"
+              content="最小1最大10"
+          >
+            <el-input-number
+                v-model="ruleForm.autoDeleteInterval"
+                class="mx-4"
+                :min="1"
+                :max="10"
+                controls-position="right"
+            />
+          </el-tooltip>
         </div>
       </el-form-item>
-      <el-form-item label="拉流地址：" prop="mediaAddress">
-        <el-input v-model="ruleForm.mediaAddress"/>
+      <el-form-item label="单位：" prop="unit">
+        <el-radio-group style="margin-right: 20px;" v-model="ruleForm.unit">
+          <el-radio label="hour">时</el-radio>
+          <el-radio label="day">日</el-radio>
+          <el-radio label="week">周</el-radio>
+          <el-radio label="month">月</el-radio>
+          <el-radio label="year">年</el-radio>
+        </el-radio-group>
+        <el-tooltip
+            class="box-item"
+            effect="light"
+            placement="right"
+        >
+          <template #content>
+            选择删除打卡历史数据的时间，比如填报时间为3，单位选择天，那么系统将最多保留三天内的数据
+          </template>
+          <el-icon color="gray">
+            <InfoFilled/>
+          </el-icon>
+        </el-tooltip>
       </el-form-item>
-      <el-form-item label="参数因子：" prop="customParam">
-        <el-input v-model="ruleForm.customParam"/>
-      </el-form-item>
-      <el-form-item label="时间设置：" prop="currentDateTime">
-        <div>
-          <el-date-picker
-              v-model="ruleForm.currentDateTime"
-              type="datetime"
-              format="YYYY-MM-DD HH:mm:ss"
-              @focus="modifyDateTime"
-          />
-        </div>
-      </el-form-item>
-      <el-form-item label="设备版本号：" prop="deviceVersion">
-        <el-input v-model="ruleForm.deviceVersion"/>
-      </el-form-item>
-      <el-form-item label="算法版本：" prop="algorithmVersion">
-        <el-input v-model="ruleForm.algorithmVersion"/>
-      </el-form-item>
-      <el-form-item label="系统版本：" prop="systemVersion">
-        <el-input v-model="ruleForm.systemVersion"/>
+      <el-form-item label="启用定期删除：" prop="isEnable">
+        <el-switch
+            v-model="ruleForm.isEnable"
+            inline-prompt
+            active-text="启用"
+            inactive-text="停用"
+        />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm(ruleFormRef)">

@@ -37,7 +37,7 @@ axiosInstance.interceptors.request.use(config => {
 axiosInstance.interceptors.response.use(response => {
         const data = response.data
         if (data.code == -1) {
-            ElMessage.error(data.msg || "服务器出错")
+            console.log(data.msg)
             // 请求出错
             return data
         } else if (data.code == -2) {

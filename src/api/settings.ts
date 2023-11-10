@@ -1,10 +1,9 @@
-
 import {get, post} from "@/utils/service";
 import type {SettingFormInterface} from "@/api/interface";
 
-export const updateSettingApi = (data: SettingFormInterface) => {
+export const updateSettingApi = (data: any) => {
     return post({
-        url: "/update_settings",
+        url: "/updateSettings",
         data: data
     })
 }
@@ -12,12 +11,12 @@ export const updateSettingApi = (data: SettingFormInterface) => {
 
 export const getSettingsApi = () => {
     return get({
-        url: "/get_settings",
+        url: "/getSettings",
     })
 }
 
 export const restartDeviceApi = () => {
     return get({
-        url: "/restart_device",
+        url: "/restartDevice",
     })
 }
