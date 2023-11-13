@@ -56,7 +56,7 @@ const handleLogin = async () => {
   <div class="login_wrap">
     <div class="form_wrap">
       <div style="width: 300px;text-align: center;justify-items: center;padding: 0 0 30px 0">
-        <el-text type="primary" style="font-size: 26px; font-weight: bold">火车车厢智能识别系统</el-text>
+        <el-text type="primary" style="font-size: 22px; font-weight: bold">人脸识别打卡机后台管理系统</el-text>
       </div>
       <el-form
           ref="formRef" :model="loginData" label-width="80px" class="demo-dynamic" :rules="rules" style="width: 300px">

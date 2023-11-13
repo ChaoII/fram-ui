@@ -5,14 +5,13 @@ import {onMounted, reactive, ref} from 'vue'
 import {getAttendInfosApi} from "@/api/attend";
 import type {TableDataInterface, PageInterface} from "@/page/attend/interface";
 import {host} from "@/utils/service";
+import {InfoFilled} from "@element-plus/icons-vue";
 
-const currentDate = new Date()
-const currentDay = currentDate.getDate();
-const previousDay = currentDay - 1
-currentDate.setDate(previousDay)
+
 const totalPage = ref(0)
-const dateTimeStart = ref<Date>(currentDate)
-const dateTimeEnd = ref<Date>(new Date())
+const dateTimeStart = ref<Date>()
+const dateTimeEnd = ref<Date>()
+
 const attend_name = ref("")
 const myElement = ref<HTMLElement | null>(null);
 const tableHeight = ref(0); // 默认最大高度为200px
@@ -32,6 +31,7 @@ const queryParams: PageInterface = reactive({
 });
 const getAttendInfos = async () => {
   const res = await getAttendInfosApi({
+
     start_time: dateTimeStart.value,
     end_time: dateTimeEnd.value,
     attend_name: attend_name.value,
@@ -75,13 +75,17 @@ window.addEventListener('resize', setTableHeight);
               <el-date-picker
                   v-model="dateTimeStart"
                   type="datetime"
+                  placeholder="请选择开始时间"
                   format="YYYY-MM-DD HH:mm:ss"
+                  value-format="YYYY-MM-DDTHH:mm:ss"
               />
               <el-text style="padding: 0 5px 0 5px">到</el-text>
               <el-date-picker
                   v-model="dateTimeEnd"
                   type="datetime"
+                  placeholder="请选择结束时间"
                   format="YYYY-MM-DD HH:mm:ss"
+                  value-format="YYYY-MM-DDTHH:mm:ss"
               />
             </div>
             <div>
@@ -92,6 +96,16 @@ window.addEventListener('resize', setTableHeight);
             </div>
             <div style="margin-left: 10px">
               <el-checkbox v-model="is_show_image" label="显示图片" size="default" border/>
+            </div>
+            <div style="margin-left: 10px;  display: flex;align-items: center;">
+              <el-tooltip class="box-item" placement="bottom">
+                <template #content>
+                  当开始时间和结束时间为空时，默认为当天0时到后一天0时，姓名为空默认搜索所有人
+                </template>
+                <el-icon color="rgb(64,158,255)">
+                  <InfoFilled/>
+                </el-icon>
+              </el-tooltip>
             </div>
           </div>
         </div>

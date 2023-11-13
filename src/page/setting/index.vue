@@ -7,9 +7,10 @@ import {InfoFilled} from '@element-plus/icons-vue'
 
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive({
-  autoDeleteInterval: 1,
-  unit: "month",
-  isEnable: true
+  id: -1,
+  deleteIntervalNum: 1,
+  deleteIntervalUnit: "month",
+  isEnableDelete: true
 })
 
 
@@ -21,13 +22,15 @@ onMounted(async () => {
 const getSettings = async () => {
   const result = await getSettingsApi()
   if (result.data) {
-    ruleForm.autoDeleteInterval = result.data.autoDeleteInterval
-    ruleForm.unit = result.data.unit
-    ruleForm.isEnable = result.data.isEnable
+    ruleForm.id = result.data.id
+    ruleForm.deleteIntervalNum = result.data.deleteIntervalNum
+    ruleForm.deleteIntervalUnit = result.data.deleteIntervalUnit
+    ruleForm.isEnableDelete = !!result.data.isEnableDelete;
   }
 }
 
 const updateSettings = async () => {
+  console.log(ruleForm)
   await updateSettingApi(ruleForm)
   await getSettings()
   ElMessage.success("更新成功")
@@ -76,7 +79,7 @@ const open = async () => {
               content="最小1最大10"
           >
             <el-input-number
-                v-model="ruleForm.autoDeleteInterval"
+                v-model="ruleForm.deleteIntervalNum"
                 class="mx-4"
                 :min="1"
                 :max="10"
@@ -86,7 +89,7 @@ const open = async () => {
         </div>
       </el-form-item>
       <el-form-item label="单位：" prop="unit">
-        <el-radio-group style="margin-right: 20px;" v-model="ruleForm.unit">
+        <el-radio-group style="margin-right: 20px;" v-model="ruleForm.deleteIntervalUnit">
           <el-radio label="hour">时</el-radio>
           <el-radio label="day">日</el-radio>
           <el-radio label="week">周</el-radio>
@@ -101,14 +104,14 @@ const open = async () => {
           <template #content>
             选择删除打卡历史数据的时间，比如填报时间为3，单位选择天，那么系统将最多保留三天内的数据
           </template>
-          <el-icon color="gray">
+          <el-icon color="rgb(64,158,255)">
             <InfoFilled/>
           </el-icon>
         </el-tooltip>
       </el-form-item>
       <el-form-item label="启用定期删除：" prop="isEnable">
         <el-switch
-            v-model="ruleForm.isEnable"
+            v-model="ruleForm.isEnableDelete"
             inline-prompt
             active-text="启用"
             inactive-text="停用"
