@@ -41,6 +41,8 @@ const deleteFace = async (index_id: string) => {
     if (res.code == 0) {
       await getFaceInfos()
       ElMessage.success("删除人脸成功")
+    } else {
+      ElMessage.error("删除人脸超时失败")
     }
   } catch (e) {
     ElMessage.success("取消删除")
