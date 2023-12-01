@@ -15,8 +15,8 @@ export const getSettingsApi = () => {
     })
 }
 
-export const restartDeviceApi = () => {
+export const restartProgramApi = () => {
     return get({
-        url: "/settings/restartDevice",
+        url: "/settings/restartProgram",
     })
 }

@@ -119,7 +119,7 @@ const clearAddFaceInfo = async () => {
         <div style=" display: flex; flex-wrap: wrap;overflow-y:auto;max-height: calc(100vh - 260px)">
           <div style="margin: 5px; width: calc(20% - 10px)" v-for="(faceInfo,k) in faceInfos" :key="k">
             <el-card :body-style="{ padding: '8px' }">
-              <el-image :src="host + '/' + faceInfo.pic_url" style="height: 200px;width: 100%">
+              <el-image :src="host + '/' + faceInfo.pic_url" style="height: 300px;width: 100%">
               </el-image>
               <el-form
                   :label-position="'right'"

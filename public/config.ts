@@ -3,6 +3,6 @@ export interface GlobalConfig {
 }
 
 export const global_config: GlobalConfig = {
-    // "api_host": "zhuzhu"
-    "api_host": "http://127.0.0.1:8090"
+    // "api_host": "fram"
+    "api_host": "http://172.168.1.253:8091"
 }

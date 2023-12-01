@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref} from 'vue'
 import type {FormInstance} from 'element-plus'
-import {getSettingsApi, restartDeviceApi, updateSettingApi} from "@/api/settings";
+import {getSettingsApi, restartProgramApi, updateSettingApi} from "@/api/settings";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {InfoFilled} from '@element-plus/icons-vue'
 
@@ -41,9 +41,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await updateSettings()
 }
 
-const restartDevice = async () => {
+const restartProgram = async () => {
   //todo 重启设备
-  await restartDeviceApi()
+  await restartProgramApi()
   ElMessage.success("设备已重启，请稍等片刻段继续访问")
 }
 
@@ -54,7 +54,7 @@ const open = async () => {
       cancelButtonText: '取消',
       type: "warning",
     })
-    await restartDevice()
+    await restartProgram()
   } catch {
     ElMessage.warning("取消重启设备")
   }
